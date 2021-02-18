@@ -19,3 +19,4 @@ delayCheck.place(x = 35, y = 80)
 
 
 top.mainloop()
+
