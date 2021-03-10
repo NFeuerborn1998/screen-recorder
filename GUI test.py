@@ -4,6 +4,12 @@ from tkinter import messagebox
 top = Tk()
 top.geometry("1000x500")           #sets size of the window
 
+recordOptions = Frame(top, width = 130, height = 140, bg = "gray85", highlightbackground="black", highlightthickness=1)     #creates a background frame to group the recording options together
+recordOptions.place(x = 28, y = 45)
+
+recordLabel = Label(top, text = "Record Options", font = "bold")          #creates the label text Record Option
+recordLabel.place(x = 35, y = 20)
+
 def onRecordClick():                              #changes the recording button between starting and stopping
     if(recordButton['text']=="Start Recording"):
         recordButton['text']="Stop Recording"
@@ -29,6 +35,7 @@ variable.set("Top-Left")
 cameraDropMenu = OptionMenu(top, variable, "Top-Left", "Top-Right", "Bottom-Left", "Bottom-Right")   #creates the drop down menu to select camera location
 cameraDropMenu.place(x = 33, y = 150)
 cameraDropMenu.config(width = 12)                                                                    #sets length of drop menu to remain the same
+
 
 top.mainloop()
 
