@@ -3,13 +3,15 @@ from tkinter import ttk
 from tkinter import messagebox
 import time
 
+#######################Timer Functions###################################
+
 class Timer:
 
-    def __init__(self):
+    def __init__(self):              #initializes the class
         self.start_time = 0
         self.timing = None
 
-    def timeDisplay(self):
+    def timeDisplay(self):           #Starts displaying the amount of time from the start of the recording on the timer
 
         sec = time.time() - self.start_time
 
@@ -20,21 +22,21 @@ class Timer:
         timerLabel.config(text = "Recording Time: {0}:{1}:{2}".format(int(hours),int(mins),int(sec)))
         self.timing = timerLabel.after(1000, self.timeDisplay)
 
-    def setStartTime(self):
+    def setStartTime(self):            #sets the start time of the recording for future use
         start_time = self.getStartTime()
         if(start_time == 0):
             self.start_time = time.time()
     
-    def getStartTime(self):
+    def getStartTime(self):            #gets the start time of the recording
         return self.start_time
 
-    def restartStartTime(self):
+    def restartStartTime(self):        #restarts the start time and stops the timer when stopping recording
         self.start_time = 0
         timerLabel.after_cancel(self.timing)
         self.timing = None
         timerLabel['text'] = "Recording Time: 0:0:0"
 
-t = Timer()
+t = Timer()          #sets up the class for use
 
 top = Tk()
 top.title("Screen Recorder")       #sets the title of the window
@@ -66,7 +68,14 @@ def onRecordClick():                              #changes the recording button 
 recordButton = Button(top, text = "Start Recording", command = onRecordClick, width = 15)  #creates the recording button
 recordButton.place(x = 35,y = 50)
 
-pauseButton = Button(top, text = "Pause Recording", state = "disabled", width = 15)         #creates the pause button
+def onPauseClick():
+    if(pauseButton['text']=="Pause Recording"):
+        pauseButton['text']="Resume Recording"
+    else:
+        pauseButton['text']="Pause Recording"
+
+
+pauseButton = Button(top, text = "Pause Recording", command = onPauseClick, state = "disabled", width = 15)         #creates the pause button
 pauseButton.place(x=35, y = 80)
 
 CheckVar1 = IntVar()
@@ -116,7 +125,7 @@ timerDisplayLabel.place(x = 40, y = 230)
 timerDisplay = Frame(top, width = 180, height = 100, bg = "gray85", highlightbackground="black", highlightthickness=1)        #creates the timer frame
 timerDisplay.place(x = 28, y = 260)
 
-timerLabel = Label(top, text = "Recording Time: 0:0:0", bg = "gray85")
+timerLabel = Label(top, text = "Recording Time: 0:0:0", bg = "gray85")        #sets up the timer label
 timerLabel.place(x = 35, y = 275)
 
 
