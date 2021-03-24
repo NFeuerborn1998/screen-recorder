@@ -10,17 +10,32 @@ class Timer:
     def __init__(self):              #initializes the class
         self.start_time = 0
         self.timing = None
+        self.sec = 0
+        self.holdTime = 0
+        self.time = 0
 
     def timeDisplay(self):           #Starts displaying the amount of time from the start of the recording on the timer
 
-        sec = time.time() - self.start_time
+        self.sec = time.time() - self.start_time
 
-        mins = sec // 60
-        sec = sec % 60
+
+        mins = self.sec // 60
+        self.sec = self.sec % 60
         hours = mins // 60
         mins = mins % 60
-        timerLabel.config(text = "Recording Time: {0}:{1}:{2}".format(int(hours),int(mins),int(sec)))
+        timerLabel.config(text = "Recording Time: {0}:{1}:{2}".format(int(hours),int(mins),int(self.sec)))
         self.timing = timerLabel.after(1000, self.timeDisplay)
+
+    def continueDisplay(self):           #continues displaying the amount of time from the start of the recording on the timer adding the old time
+
+        self.sec = time.time() - self.start_time + self.holdTime
+
+        mins = self.sec // 60
+        self.sec = self.sec % 60
+        hours = mins // 60
+        mins = mins % 60
+        timerLabel.config(text = "Recording Time: {0}:{1}:{2}".format(int(hours),int(mins),int(self.sec)))
+        self.timing = timerLabel.after(1000, self.continueDisplay)
 
     def setStartTime(self):            #sets the start time of the recording for future use
         start_time = self.getStartTime()
@@ -34,13 +49,21 @@ class Timer:
         self.start_time = 0
         timerLabel.after_cancel(self.timing)
         self.timing = None
+        self.holdTime = 0
         timerLabel['text'] = "Recording Time: 0:0:0"
+
+    def setOldTime(self):              #holds the time for future use on the timer until it is reset
+        self.holdTime += time.time() - self.start_time
+
+    def pauseTime(self):                #pauses the timer and sets the start time to 0
+        self.start_time = 0
+        timerLabel.after_cancel(self.timing)
 
 t = Timer()          #sets up the class for use
 
 top = Tk()
 top.title("Screen Recorder")       #sets the title of the window
-top.geometry("1000x500")           #sets size of the window
+top.geometry("800x350")           #sets size of the window
 photo = PhotoImage(file = "icons/icon.png")
 top.iconphoto(False, photo)
 
@@ -71,9 +94,13 @@ recordButton.place(x = 35,y = 50)
 def onPauseClick():
     if(pauseButton['text']=="Pause Recording"):
         pauseButton['text']="Resume Recording"
+        t.setOldTime()
+        t.pauseTime()
+
     else:
         pauseButton['text']="Pause Recording"
-
+        t.setStartTime()
+        t.continueDisplay()
 
 pauseButton = Button(top, text = "Pause Recording", command = onPauseClick, state = "disabled", width = 15)         #creates the pause button
 pauseButton.place(x=35, y = 80)
@@ -99,7 +126,7 @@ cameraDropMenu.bind("<FocusIn>",lambda x: recordOptions.focus())
 fileLabel = Label(top, text = "File Options", font = "bold")          #creates the label text Record Option
 fileLabel.place(x = 188, y = 20)
 
-fileOptions = Frame(top, width = 130, height = 140, bg = "gray85", highlightbackground="black", highlightthickness=1)     #creates a background frame to group the recording options together
+fileOptions = Frame(top, width = 130, height = 180, bg = "gray85", highlightbackground="black", highlightthickness=1)     #creates a background frame to group the recording options together
 fileOptions.place(x = 170, y = 45)
 
 saveLabel = Label(top, text = "Save Location:", bg = "gray85")          #creates the label text Record Option
@@ -115,18 +142,18 @@ locationButton = Button(top, text = "Choose Location", width = 14)  #creates the
 locationButton.place(x = 180, y = 105)
 
 saveButton = Button(top, text = "Save MP4", font = "bold", width = 11)
-saveButton.place(x = 180, y = 140)
+saveButton.place(x = 180, y = 180)
 
 ####################Timer Display####################
 
-timerDisplayLabel = Label(top, text = "Timer Display", font = "bold")       #creates the label for the timer frame
-timerDisplayLabel.place(x = 40, y = 230)
+#timerDisplayLabel = Label(top, text = "Timer Display", font = "bold")       #creates the label for the timer frame
+#timerDisplayLabel.place(x = 40, y = 230)
 
-timerDisplay = Frame(top, width = 180, height = 100, bg = "gray85", highlightbackground="black", highlightthickness=1)        #creates the timer frame
-timerDisplay.place(x = 28, y = 260)
+timerDisplay = Frame(top, width = 272, height = 50, bg = "gray85", highlightbackground="black", highlightthickness=1)        #creates the timer frame
+timerDisplay.place(x = 28, y = 235)
 
-timerLabel = Label(top, text = "Recording Time: 0:0:0", bg = "gray85")        #sets up the timer label
-timerLabel.place(x = 35, y = 275)
+timerLabel = Label(top, text = "Recording Time: 0:0:0", font = "bold", bg = "gray85")        #sets up the timer label
+timerLabel.place(x = 80, y = 247)
 
 
 
