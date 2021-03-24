@@ -63,7 +63,7 @@ t = Timer()          #sets up the class for use
 
 top = Tk()
 top.title("Screen Recorder")       #sets the title of the window
-top.geometry("800x350")           #sets size of the window
+top.geometry("800x325")           #sets size of the window
 photo = PhotoImage(file = "icons/icon.png")
 top.iconphoto(False, photo)
 
@@ -91,7 +91,7 @@ def onRecordClick():                              #changes the recording button 
 recordButton = Button(top, text = "Start Recording", command = onRecordClick, width = 15)  #creates the recording button
 recordButton.place(x = 35,y = 50)
 
-def onPauseClick():
+def onPauseClick():                                #changes the pause button between pause and resume
     if(pauseButton['text']=="Pause Recording"):
         pauseButton['text']="Resume Recording"
         t.setOldTime()
@@ -155,7 +155,10 @@ timerDisplay.place(x = 28, y = 235)
 timerLabel = Label(top, text = "Recording Time: 0:0:0", font = "bold", bg = "gray85")        #sets up the timer label
 timerLabel.place(x = 80, y = 247)
 
+####################Recording Preview Display######################
 
+recordingPreview = Frame(top, width = 426, height = 240, highlightbackground = "black", highlightthickness = 1)
+recordingPreview.place(x = 340, y = 45)
 
 top.mainloop()
 
