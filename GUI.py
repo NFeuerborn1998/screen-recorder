@@ -2,6 +2,9 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 import time
+import cv2
+import numpy as np
+import pyautogui
 
 #######################Timer Functions###################################
 
@@ -141,7 +144,7 @@ locationText.config(state = "disabled")    #have to enable textbox, set the loca
 locationButton = Button(top, text = "Choose Location", width = 14)  #creates the saving location button
 locationButton.place(x = 180, y = 105)
 
-saveButton = Button(top, text = "Save MP4", font = "bold", width = 11)
+saveButton = Button(top, text = "Save Video", font = "bold", width = 11)
 saveButton.place(x = 180, y = 180)
 
 ####################Timer Display####################
