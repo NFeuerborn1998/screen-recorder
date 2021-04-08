@@ -5,6 +5,8 @@ import time
 import cv2
 import numpy as np
 import pyautogui
+import threading
+from PIL import Image, ImageTk, ImageGrab
 
 #######################Timer Functions###################################
 
@@ -64,6 +66,12 @@ class Timer:
 
 t = Timer()          #sets up the class for use
 
+
+
+SCREEN_SIZE = pyautogui.size()
+fourcc=cv2.VideoWriter_fourcc(*"XVID")
+out = cv2.VideoWriter()
+
 top = Tk()
 top.title("Screen Recorder")       #sets the title of the window
 top.geometry("800x325")           #sets size of the window
@@ -84,11 +92,13 @@ def onRecordClick():                              #changes the recording button 
         pauseButton.config(state = "normal")
         t.setStartTime()
         t.timeDisplay()
+        startRecording()
 
     else:
         recordButton['text']="Start Recording"
         pauseButton.config(state = "disabled")
         t.restartStartTime()
+        stopRecording()
 
 
 recordButton = Button(top, text = "Start Recording", command = onRecordClick, width = 15)  #creates the recording button
@@ -99,11 +109,13 @@ def onPauseClick():                                #changes the pause button bet
         pauseButton['text']="Resume Recording"
         t.setOldTime()
         t.pauseTime()
+        pauseRecord()
 
     else:
         pauseButton['text']="Pause Recording"
         t.setStartTime()
         t.continueDisplay()
+        resumeRecord()
 
 pauseButton = Button(top, text = "Pause Recording", command = onPauseClick, state = "disabled", width = 15)         #creates the pause button
 pauseButton.place(x=35, y = 80)
@@ -160,8 +172,57 @@ timerLabel.place(x = 80, y = 247)
 
 ####################Recording Preview Display######################
 
-recordingPreview = Frame(top, width = 426, height = 240, highlightbackground = "black", highlightthickness = 1)
-recordingPreview.place(x = 340, y = 45)
+recordImage = ImageTk.PhotoImage(Image.new('RGB', (426, 240), (0,0,0)))
+
+def previewScreen():
+    preview = True
+    while preview:
+        tempImg = pyautogui.screenshot()
+        tempFrame = np.array(tempImg)
+        tempFrame = cv2.cvtColor(tempFrame, cv2.COLOR_RGB2BGR)
+        tempFrame = cv2.resize(tempFrame, (426, 240))
+        recordImage.paste(Image.fromarray(tempFrame))
+        time.sleep(1/30)
+
+threading.Thread(target=previewScreen, daemon=True).start()
+
+recordingPreview = Frame(top, width = 432, height = 246, highlightbackground = "black", highlightthickness = 1)
+recordingPreview.place(x = 339, y = 44)
+recordingScreens = Label(top, width = 426, height = 240, image = recordImage)
+recordingScreens.place(x = 340, y = 45)
+
+
+####################Recording Screen Modules######################
+
+
+def startRecording():
+    if not out.isOpened():
+        out.open("output.avi", fourcc, 10, (SCREEN_SIZE))
+    threading.Thread(target=screenRecord, daemon=True).start()
+
+def screenRecord():
+    global recording
+    recording = True
+    while recording:
+        img = pyautogui.screenshot()
+        frame = np.array(img)
+        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        out.write(frame)
+
+def pauseRecord():
+    global recording
+    recording = False
+
+def resumeRecord():
+    global recording
+    recording = True
+    if not out.isOpened():
+        out.open("output.avi", fourcc, 10, (SCREEN_SIZE))
+    threading.Thread(target=screenRecord, daemon=True).start()
+
+def stopRecording():
+    global recording
+    recording = False
+    out.release()
 
 top.mainloop()
-
