@@ -126,7 +126,7 @@ delayCheck = Checkbutton(top, text = "5s Delay", bg = "gray85", variable = Check
 delayCheck.place(x = 35, y = 110)  
 
 CheckVar2 = IntVar()
-cameraCheck = Checkbutton(top, text = "Record Camera", bg = "gray85", variable = CheckVar2, onvalue = 1, offvalue = 0)   #creates the record camera button
+cameraCheck = Checkbutton(top, text = "Record Camera", bg = "gray85", variable = CheckVar2, onvalue = 1, offvalue = 0, state = DISABLED)   #creates the record camera button
 cameraCheck.place(x = 35, y = 135)
 
 cameraLabel = Label(top, text = "Camera Location:", bg = "gray85")       #Label for camera location
@@ -136,6 +136,11 @@ cameraDropMenu = ttk.Combobox(top, width = 14, values = ["Top-Left", "Top-Right"
 cameraDropMenu.current(0)
 cameraDropMenu.place(x = 37, y = 190)     
 cameraDropMenu.bind("<FocusIn>",lambda x: recordOptions.focus())
+
+if video is None or not video.isOpened():
+    cameraCheck.config(state = DISABLED)
+else:
+    cameraCheck.config(state = NORMAL)
 
 #####################File Options####################
 
@@ -156,9 +161,6 @@ locationText.config(state = "disabled")    #have to enable textbox, set the loca
 
 locationButton = Button(top, text = "Choose Location", width = 14)  #creates the saving location button
 locationButton.place(x = 180, y = 105)
-
-saveButton = Button(top, text = "Save Video", font = "bold", width = 11)
-saveButton.place(x = 180, y = 180)
 
 ####################Timer Display####################
 
