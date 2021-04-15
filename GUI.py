@@ -205,14 +205,22 @@ def screenRecord():
     global recording
     recording = True
     while recording:
-        img = pyautogui.screenshot()
-        frame = np.array(img)
-        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        if CheckVar2.get() == 1:
+            break
+        else:
+            img = pyautogui.screenshot()
+            frame = np.array(img)
+            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+
+        #img = pyautogui.screenshot()
+        #videoImg = video.read()
+        #combinedFrame = cv2.addWeighted(np.float32(img),1,videoImg,1,0)
+        #frame = np.array(combinedFrame)
+        #frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         #if CheckVar2 == 1:
-        videoImg = video.read()
-        videoFrame = np.array(videoImg)
+
         #gray = cv2.cvtColor(videoFrame, cv2.COLOR_BGR2GRAY)
-        frame = cv2.addWeighted(frame,1,np.float32(videoFrame),1,0)
+
         out.write(frame)
 
 def pauseRecord():
