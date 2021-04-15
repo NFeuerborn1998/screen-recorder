@@ -71,12 +71,13 @@ t = Timer()          #sets up the class for use
 SCREEN_SIZE = pyautogui.size()
 fourcc=cv2.VideoWriter_fourcc(*"XVID")
 out = cv2.VideoWriter()
-
+video =cv2.VideoCapture(0) 
 top = Tk()
 top.title("Screen Recorder")       #sets the title of the window
 top.geometry("800x325")           #sets size of the window
 photo = PhotoImage(file = "icons/icon.png")
 top.iconphoto(False, photo)
+
 
 ##################Record Options######################
 
@@ -197,8 +198,7 @@ recordingScreens.place(x = 340, y = 45)
 
 def startRecording():
     if not out.isOpened():
-        out.open("output.avi", fourcc, 10, (SCREEN_SIZE))
-        video =cv2.VideoCapture(0)
+        out.open("output.avi", fourcc, 10, (SCREEN_SIZE))  
     threading.Thread(target=screenRecord, daemon=True).start()
 
 def screenRecord():
@@ -208,13 +208,10 @@ def screenRecord():
         img = pyautogui.screenshot()
         frame = np.array(img)
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-        try:
-            if CheckVar2 == 1:
-                videoFrame = video.read()
-                frame = cv2.addWeighted(frame,1,videoFrame,1,0)
-        except:
-            tkinter.messagebox.showerror(title = Error, message = "There is no camera detected")
-            break
+        #if CheckVar2 == 1:
+        videoFrame = video.read()
+        #gray = cv2.cvtColor(videoFrame, cv2.COLOR_BGR2GRAY)
+        frame = cv2.addWeighted(frame,1,videoFrame,1,0)
         out.write(frame)
 
 def pauseRecord():
@@ -226,7 +223,6 @@ def resumeRecord():
     recording = True
     if not out.isOpened():
         out.open("output.avi", fourcc, 10, (SCREEN_SIZE))
-        video =cv2.VideoCapture(0)
     threading.Thread(target=screenRecord, daemon=True).start()
 
 def stopRecording():
