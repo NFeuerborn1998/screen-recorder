@@ -198,6 +198,7 @@ recordingScreens.place(x = 340, y = 45)
 def startRecording():
     if not out.isOpened():
         out.open("output.avi", fourcc, 10, (SCREEN_SIZE))
+        video =cv2.VideoCapture(0)
     threading.Thread(target=screenRecord, daemon=True).start()
 
 def screenRecord():
@@ -207,6 +208,10 @@ def screenRecord():
         img = pyautogui.screenshot()
         frame = np.array(img)
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        try:
+            if CheckVar2 = 1:
+                videoFrame = video.read()
+                frame = cv2.addWeighted(frame,1,videoFrame,1,0)
         out.write(frame)
 
 def pauseRecord():
@@ -218,11 +223,13 @@ def resumeRecord():
     recording = True
     if not out.isOpened():
         out.open("output.avi", fourcc, 10, (SCREEN_SIZE))
+        video =cv2.VideoCapture(0)
     threading.Thread(target=screenRecord, daemon=True).start()
 
 def stopRecording():
     global recording
     recording = False
     out.release()
+    video.release()
 
 top.mainloop()
