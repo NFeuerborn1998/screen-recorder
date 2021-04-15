@@ -209,9 +209,12 @@ def screenRecord():
         frame = np.array(img)
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         try:
-            if CheckVar2 = 1:
+            if CheckVar2 == 1:
                 videoFrame = video.read()
                 frame = cv2.addWeighted(frame,1,videoFrame,1,0)
+        except:
+            tkinter.messagebox.showerror(title = Error, message = "There is no camera detected")
+            break
         out.write(frame)
 
 def pauseRecord():
