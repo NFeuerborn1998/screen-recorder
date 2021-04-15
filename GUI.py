@@ -209,9 +209,10 @@ def screenRecord():
         frame = np.array(img)
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         #if CheckVar2 == 1:
-        videoFrame = video.read()
+        videoImg = video.read()
+        videoFrame = np.array(videoImg)
         #gray = cv2.cvtColor(videoFrame, cv2.COLOR_BGR2GRAY)
-        frame = cv2.addWeighted(frame,1,videoFrame,1,0)
+        frame = cv2.addWeighted(frame,1,np.float32(videoFrame),1,0)
         out.write(frame)
 
 def pauseRecord():
