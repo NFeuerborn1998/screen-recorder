@@ -91,6 +91,8 @@ def onRecordClick():                              #changes the recording button 
     if(recordButton['text']=="Start Recording"):
         recordButton['text']="Stop Recording"
         pauseButton.config(state = "normal")
+        if CheckVar1.get() == 1:
+            time.sleep(5)
         t.setStartTime()
         t.timeDisplay()
         startRecording()
@@ -210,16 +212,17 @@ def screenRecord():
             img = pyautogui.screenshot()
             ret, videoImg = video.read()
             if ret is True:
+                videoImg = cv2.resize(videoImg, (426, 240))
                 rows,cols,channels = videoImg.shape
             frame = np.array(img)
             if ret is True:
                 frame[0:rows, 0:cols] = videoImg
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+            time.sleep(1/90)
         else:
             img = pyautogui.screenshot()
             frame = np.array(img)
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-        time.sleep(1/90)
         out.write(frame)
 
 def pauseRecord():
