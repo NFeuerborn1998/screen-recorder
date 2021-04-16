@@ -184,7 +184,6 @@ def previewScreen():
     while preview:
         tempImg = pyautogui.screenshot()
         tempFrame = np.array(tempImg)
-        tempFrame = cv2.cvtColor(tempFrame, cv2.COLOR_RGB2BGR)
         tempFrame = cv2.resize(tempFrame, (426, 240))
         recordImage.paste(Image.fromarray(tempFrame))
 
