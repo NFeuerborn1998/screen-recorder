@@ -211,8 +211,8 @@ def screenRecord():
             img = pyautogui.screenshot()
             videoImg = video.read()
             frame = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-            rows,cols,channels = videoImg.shape
-            frame[0:rows, 0:cols] = dst
+            rows,cols = videoImg.shape
+            frame[0:rows, 0:cols] = videoImg
             frame = np.array(frame)
         else:
             img = pyautogui.screenshot()
