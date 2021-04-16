@@ -185,7 +185,6 @@ def previewScreen():
         tempFrame = cv2.cvtColor(tempFrame, cv2.COLOR_RGB2BGR)
         tempFrame = cv2.resize(tempFrame, (426, 240))
         recordImage.paste(Image.fromarray(tempFrame))
-        time.sleep(1/30)
 
 threading.Thread(target=previewScreen, daemon=True).start()
 
@@ -209,25 +208,18 @@ def screenRecord():
     while recording:
         if CheckVar2.get() == 1:
             img = pyautogui.screenshot()
-            videoImg = video.read()
-            frame = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-            rows,cols = videoImg.shape
-            frame[0:rows, 0:cols] = videoImg
-            frame = np.array(frame)
+            ret, videoImg = video.read()
+            if ret is True:
+                rows,cols,channels = videoImg.shape
+            frame = np.array(img)
+            if ret is True:
+                frame[0:rows, 0:cols] = videoImg
+            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         else:
             img = pyautogui.screenshot()
             frame = np.array(img)
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-
-        #img = pyautogui.screenshot()
-        #videoImg = video.read()
-        #combinedFrame = cv2.addWeighted(np.float32(img),1,videoImg,1,0)
-        #frame = np.array(combinedFrame)
-        #frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-        #if CheckVar2 == 1:
-
-        #gray = cv2.cvtColor(videoFrame, cv2.COLOR_BGR2GRAY)
-
+        time.sleep(1/90)
         out.write(frame)
 
 def pauseRecord():
