@@ -136,7 +136,7 @@ cameraLabel.place(x = 35, y = 165)
 
 cameraDropMenu = ttk.Combobox(top, width = 14, values = ["Top-Left", "Top-Right", "Bottom-Left", "Bottom-Right"], state = "readonly")   #creates the drop down menu to select camera location
 cameraDropMenu.current(0)
-cameraDropMenu.place(x = 37, y = 190)     
+cameraDropMenu.place(x = 37, y = 190)
 cameraDropMenu.bind("<FocusIn>",lambda x: recordOptions.focus())
 
 if video is None or not video.isOpened():
@@ -213,9 +213,14 @@ def screenRecord():
             if ret is True:
                 videoImg = cv2.resize(videoImg, (426, 240))
                 rows,cols,channels = videoImg.shape
+                rows2,cols2,channels2 = img.shape
             frame = np.array(img)
             if ret is True:
-                frame[0:rows, 0:cols] = videoImg
+                if cameraDropMenu.get == "Top-Left":
+                    frame[0:rows, 0:cols] = videoImg
+                elif cameraDropMenu.get == "Top-Right":
+                    rows3 = rows2 - rows
+                    frame[rows3:rows2, 0:cols]
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
             time.sleep(1/90)
         else:
