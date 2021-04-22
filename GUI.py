@@ -210,17 +210,22 @@ def screenRecord():
         if CheckVar2.get() == 1:
             img = pyautogui.screenshot()
             ret, videoImg = video.read()
+            frame = np.array(img)
             if ret is True:
                 videoImg = cv2.resize(videoImg, (426, 240))
                 rows,cols,channels = videoImg.shape
-                rows2,cols2,channels2 = img.shape
-            frame = np.array(img)
+                rows2,cols2,channels2 = frame.shape
+                cols3 = cols2 - cols
+                rows3 = rows2 - rows
             if ret is True:
-                if cameraDropMenu.get == "Top-Left":
+                if cameraDropMenu.get() == "Top-Left":
                     frame[0:rows, 0:cols] = videoImg
-                elif cameraDropMenu.get == "Top-Right":
-                    rows3 = rows2 - rows
-                    frame[rows3:rows2, 0:cols]
+                elif cameraDropMenu.get() == "Bottom-Left":
+                    frame[rows3:rows2, 0:cols] = videoImg
+                elif cameraDropMenu.get() == "Top-Right":
+                    frame[0:rows, cols3:cols2] = videoImg
+                else:
+                    frame[rows3:rows2, cols3:cols2] = videoImg
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
             time.sleep(1/90)
         else:
