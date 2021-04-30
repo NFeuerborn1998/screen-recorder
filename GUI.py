@@ -8,6 +8,11 @@ import pyautogui
 import threading
 from PIL import Image, ImageTk, ImageGrab
 from tkinter import filedialog
+import pyaudio
+import wave
+from scipy.io import wavfile
+import ffmpeg
+
 
 #######################Timer Functions###################################
 
@@ -97,12 +102,15 @@ def onRecordClick():                              #changes the recording button 
         t.setStartTime()
         t.timeDisplay()
         startRecording()
+        saveButton.config(state = DISABLED)
 
     else:
         recordButton['text']="Start Recording"
         pauseButton.config(state = "disabled")
         t.restartStartTime()
         stopRecording()
+        voice.stopAudioRecording()
+        saveButton.config(state = NORMAL)
 
 
 recordButton = Button(top, text = "Start Recording", command = onRecordClick, width = 15)  #creates the recording button
@@ -154,32 +162,45 @@ fileOptions = Frame(top, width = 130, height = 180, bg = "gray85", highlightback
 fileOptions.place(x = 170, y = 45)
 
 saveLabel = Label(top, text = "Save Location:", bg = "gray85")          #creates the label text Record Option
-saveLabel.place(x = 180, y = 50)
+saveLabel.place(x = 180, y = 85)
 
-locationText = Text(top, width = 14, height = 1)         #creates the extbox for showing the location where the mp4 will save
-locationText.place(x = 177, y = 78)
+locationText = Text(top, width = 14, height = 3)         #creates the textbox for showing the location where the mp4 will save
+locationText.place(x = 177, y = 110)
 filename = ""
 locationText.insert("end", filename)
 locationText.config(state = "disabled")    #have to enable textbox, set the location text, and then disable the text box to show it without the user being able to manually change the text
 
 def saveLocation():                         #this will grab the filename and display it in the location Text box
     global filename
-    filename = filedialog.asksaveasfilename(title = "Select Save Location", filetypes = [("mp4 files", "*.mp4")])
+    filename = filedialog.asksaveasfilename(title = "Select Save Location", filetypes = [("mp4 files", "*.mp4")]) 
+    readLast = filename[-4:None]
+    if readLast != ".mp4":     #this will make sure the filename doesn't end with .mp4.mp4
+        filetype = ".mp4"
+        filename += filetype
     locationText.config(state = "normal")
+    locationText.delete("1.0", "end")
     locationText.insert("end", filename)
     locationText.config(state = "disabled")
     locationText.see(END)
 
 locationButton = Button(top, text = "Choose Location", width = 14, command = saveLocation)  #creates the saving location button
-locationButton.place(x = 180, y = 105)
+locationButton.place(x = 180, y = 55)
 
-saveButton = Button(top, text = "Save Video", font = "bold", width = 11)  #this will save the video and convert it to MP4
+def mp4Save(): #this will combine the output video and sound file into an mp4 and save it to the proper location
+    try:
+        #https://www.reddit.com/r/learnpython/comments/ey41dp/merging_video_and_audio_using_ffmpegpython/
+        ffmpeg.overwrite_output=True
+        video = ffmpeg.input("output.avi")
+        audio = ffmpeg.input("output.wav")
+        out = ffmpeg.output(video, audio, filename, vcodec='copy', acodec='aac', strict='experimental')
+        out.overwrite_output().run()   #overwrites any mp4 with the same name
+    except:
+        error = messagebox.showerror(title = "Error", message = "Please select a location, and make a recording first.")
+
+saveButton = Button(top, text = "Save MP4", font = "bold", width = 11, command = mp4Save)  #this will save the video and convert it to MP4
 saveButton.place(x = 180, y = 180)
 
 ####################Timer Display####################
-
-#timerDisplayLabel = Label(top, text = "Timer Display", font = "bold")       #creates the label for the timer frame
-#timerDisplayLabel.place(x = 40, y = 230)
 
 timerDisplay = Frame(top, width = 272, height = 50, bg = "gray85", highlightbackground="black", highlightthickness=1)        #creates the timer frame
 timerDisplay.place(x = 28, y = 235)
@@ -206,18 +227,44 @@ recordingPreview.place(x = 339, y = 44)
 recordingScreens = Label(top, width = 426, height = 240, image = recordImage)        #this is the label for where the screen preview goes
 recordingScreens.place(x = 340, y = 45)
 
+####################Recording Audio Modules#######################
+class VoiceRecorder:
+    def __init__(self): #the constructor should take the filename as an argument for organization
+        self.audio_format = pyaudio.paInt16 
+        self.channels = 1
+        self.sample_rate = 44100 #44100 bits/second
+        self.chunk = int(0.03*self.sample_rate)
+
+    def audioRecord(self): 
+            self.recUser_data = [] 
+            self.p = pyaudio.PyAudio() #initializes pyaudio
+            self.stream = self.p.open(format=self.audio_format, channels=self.channels, rate=self.sample_rate, input=True, frames_per_buffer=self.chunk)
+
+            while recording:
+                data = self.stream.read(self.chunk)
+                self.recUser_data.append(data)
+
+    def stopAudioRecording(self):
+            self.stream.stop_stream() #stops/closes stream
+            self.stream.close()
+            self.p.terminate()
+            self.recUser_data = [np.frombuffer(frame, dtype=np.int16) for frame in self.recUser_data]
+            wav = np.concatenate(self.recUser_data, axis=0)  #conversion of data taking place
+            wavfile.write("output.wav", self.sample_rate, wav)
+
+voice = VoiceRecorder()
 
 ####################Recording Screen Modules######################
-
 
 def startRecording():                  #opens the screen recordings and starts threading the screenRecord method
     if not out.isOpened():
         out.open("output.avi", fourcc, 10, (SCREEN_SIZE))  
-    threading.Thread(target=screenRecord, daemon=True).start()
-
-def screenRecord():                    #Starts recording the screen
     global recording
     recording = True
+    threading.Thread(target=screenRecord, daemon=True).start()
+    threading.Thread(target=voice.audioRecord, daemon=True).start()
+
+def screenRecord():                    #Starts recording the screen
     while recording:
         if CheckVar2.get() == 1:        #records the camera and screen
             img = pyautogui.screenshot()
@@ -256,6 +303,7 @@ def resumeRecord():    #resumes the recording after screen
     if not out.isOpened():
         out.open("output.avi", fourcc, 10, (SCREEN_SIZE))
     threading.Thread(target=screenRecord, daemon=True).start()
+    threading.Thread(target=voice.audioRecord, daemon=True).start()
 
 def stopRecording():    #stops the recording entirely and releases the video and camera recordings
     global recording
