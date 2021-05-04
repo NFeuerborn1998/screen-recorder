@@ -187,7 +187,7 @@ fileOptions.place(x = 170, y = 45)
 
 saveLabel = Label(top, text = "Save Location:", bg = "gray85")          
 #creates the label text Record Option
-saveLabel.place(x = 180, y = 85)
+saveLabel.place(x = 192, y = 85)
 
 locationText = Text(top, width = 14, height = 3)         
 #creates the textbox for showing the location where the mp4 will save
