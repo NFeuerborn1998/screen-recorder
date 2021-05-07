@@ -64,7 +64,7 @@ class Timer:
         self.timing = timerLabel.after(1000, self.continueDisplay)
         #https://www.geeksforgeeks.org/python-after-method-in-tkinter/
 
-    def setStartTime(self):           
+    def setStartTime(self):
          #sets the start time of the recording for future use
         start_time = self.getStartTime()
         if(start_time == 0):
@@ -290,12 +290,18 @@ class VoiceRecorder:
 
     def audioRecord(self): 
         #https://realpython.com/playing-and-recording-sound-python/
+        #https://realpython.com/playing-and-recording-sound-python/
         #records the audio
         self.recUser_data = [] 
         self.p = pyaudio.PyAudio() 
         #initializes pyaudio
         self.stream = self.p.open(format=self.audio_format, channels=self.channels, rate=self.sample_rate, input=True, frames_per_buffer=self.chunk)
 
+        while recording:
+            data = self.stream.read(self.chunk)
+            self.recUser_data.append(data)
+
+    def resumeAudioRecord(self):
         while recording:
             data = self.stream.read(self.chunk)
             self.recUser_data.append(data)
@@ -368,7 +374,7 @@ def resumeRecord():
     if not out.isOpened():
         out.open("output.avi", fourcc, 10, (SCREEN_SIZE))
     threading.Thread(target=screenRecord, daemon=True).start()
-    threading.Thread(target=voice.audioRecord, daemon=True).start()
+    threading.Thread(target=voice.resumeAudioRecord, daemon=True).start()
 
 def stopRecording():    
     #stops the recording entirely and releases the video and camera recordings
