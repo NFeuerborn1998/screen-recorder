@@ -15,9 +15,6 @@ import ffmpeg
 
 """
 Nicholas Feuerborn
-Stephan Teel
-Chanelle Hanks
-Augstine Agbavor
 
 CS 499 01
 Screen Recorder Project
